@@ -12,9 +12,12 @@ const Navbar = ({ activePage = "" }) => {
       const cart = JSON.parse(localStorage.getItem("cart") || "[]");
       setCartCount(cart.reduce((s, i) => s + i.quantity, 0));
     };
+
     updateCount();
+
     window.addEventListener("storage", updateCount);
     window.addEventListener("cartUpdated", updateCount);
+
     return () => {
       window.removeEventListener("storage", updateCount);
       window.removeEventListener("cartUpdated", updateCount);
@@ -22,19 +25,39 @@ const Navbar = ({ activePage = "" }) => {
   }, []);
 
   const handleLogout = async () => {
-    // Save cart to DB before logging out
     const token = localStorage.getItem("token");
     const cart = JSON.parse(localStorage.getItem("cart") || "[]");
+
+    // Save cart to DB 
     if (token && cart.length > 0) {
       try {
         const { default: axios } = await import("axios");
-        await axios.post("http://localhost:5000/api/cart/save",
-          { items: cart.map(i => ({ productId: i._id, quantity: i.quantity })) },
-          { headers: { Authorization: `Bearer ${token}` } }
+
+        await axios.post(
+          "http://localhost:5000/api/cart/save",
+          {
+            items: cart.map((i) => ({
+              productId: i._id,
+              quantity: i.quantity,
+            })),
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
         );
-      } catch (e) { /* silent */ }
+      } catch (e) {
+        console.log("Cart save failed", e);
+      }
     }
-    localStorage.clear();
+
+    
+    localStorage.removeItem("token");
+    localStorage.removeItem("username");
+    localStorage.removeItem("role");
+    localStorage.removeItem("userId");
+
     navigate("/");
   };
 
@@ -57,30 +80,69 @@ const Navbar = ({ activePage = "" }) => {
         .cart-badge { position:absolute; top:-6px; right:-6px; background:#e91e63; color:#fff; border-radius:50%; width:18px; height:18px; font-size:0.7rem; display:flex; align-items:center; justify-content:center; font-weight:700; }
         .nav-user { color:#d96fa6; font-weight:600; font-size:0.88rem; }
       `}</style>
+
       <nav className="navbar">
-        <Link to="/" className="nav-logo">🧵 granny_SB</Link>
+        <Link to="/" className="nav-logo">
+          🧵 granny_SB
+        </Link>
+
         <div className="nav-links">
-          <Link to="/product" className={activePage === "product" ? "active" : ""}>Shop</Link>
-          <Link to="/about" className={activePage === "about" ? "active" : ""}>About</Link>
-          <Link to="/contact" className={activePage === "contact" ? "active" : ""}>Contact</Link>
+          <Link
+            to="/product"
+            className={activePage === "product" ? "active" : ""}
+          >
+            Shop
+          </Link>
+
+          <Link
+            to="/about"
+            className={activePage === "about" ? "active" : ""}
+          >
+            About
+          </Link>
+
+          <Link
+            to="/contact"
+            className={activePage === "contact" ? "active" : ""}
+          >
+            Contact
+          </Link>
+
           {isLoggedIn ? (
             <>
               <Link to="/cart" className="cart-btn">
                 🛒 Cart
-                {cartCount > 0 && <span className="cart-badge">{cartCount}</span>}
+                {cartCount > 0 && (
+                  <span className="cart-badge">{cartCount}</span>
+                )}
               </Link>
+
               <span className="nav-user">Hi, {username}!</span>
-              <Link to="/dashboard" className="nav-btn btn-filled">Dashboard</Link>
-              <button className="nav-btn btn-ghost" onClick={handleLogout}>Logout</button>
+
+              <Link to="/dashboard" className="nav-btn btn-filled">
+                Dashboard
+              </Link>
+
+              <button className="nav-btn btn-ghost" onClick={handleLogout}>
+                Logout
+              </button>
             </>
           ) : (
             <>
               <Link to="/cart" className="cart-btn">
                 🛒 Cart
-                {cartCount > 0 && <span className="cart-badge">{cartCount}</span>}
+                {cartCount > 0 && (
+                  <span className="cart-badge">{cartCount}</span>
+                )}
               </Link>
-              <Link to="/login" className="nav-btn btn-outline">Login</Link>
-              <Link to="/register" className="nav-btn btn-filled">Register</Link>
+
+              <Link to="/login" className="nav-btn btn-outline">
+                Login
+              </Link>
+
+              <Link to="/register" className="nav-btn btn-filled">
+                Register
+              </Link>
             </>
           )}
         </div>
