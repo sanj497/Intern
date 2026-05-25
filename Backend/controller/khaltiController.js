@@ -1,5 +1,5 @@
 import axios from "axios";
-import Payment from "../model/khaltiModel.js"; // Add .js if you're using ES modules
+import Payment from "../model/khaltiModel.js"; 
 
 // Initiate Khalti payment
 export const addKhalti = async (req, res) => {

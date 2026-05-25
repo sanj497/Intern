@@ -17,11 +17,13 @@ import OrderSuccess from "./pages/OrderSuccess";
 import Dashboard from "./pages/Dashboard";
 
 
-const ProtectedRoute = ({ children, adminOnly = false }) => {
+const ProtectedRoute = ({ children }) => {
   const token = localStorage.getItem("token");
-  const role  = localStorage.getItem("role");
-  if (!token) return <Navigate to="/login" replace />;
-  if (adminOnly && role !== "admin") return <Navigate to="/dashboard" replace />;
+
+  if (!token) {
+    return <Navigate to="/login" replace />;
+  }
+
   return children;
 };
 

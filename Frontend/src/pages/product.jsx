@@ -7,7 +7,7 @@ function Product() {
   const [products, setProducts] = useState([]);
   const [cart, setCart] = useState(() => JSON.parse(localStorage.getItem("cart") || "[]"));
   const [toast, setToast] = useState("");
-  const [rawSample, setRawSample] = useState(null); // debug: shows raw first product
+  const [rawSample, setRawSample] = useState(null); 
   const navigate = useNavigate();
   const userId = localStorage.getItem("userId");
 
