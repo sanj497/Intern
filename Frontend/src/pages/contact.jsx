@@ -1,210 +1,62 @@
 import React, { useState } from "react";
+import axios from "axios";
+import Navbar from "../Components/Navbar";
 
 const Contact = () => {
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    message: "",
-  });
+  const [form, setForm] = useState({ name: "", email: "", message: "" });
   const [submitted, setSubmitted] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
-  const handleChange = (e) => {
-    setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
-  };
-
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Here you can add form submission logic (e.g., send to API)
-    setSubmitted(true);
+    setLoading(true); setError("");
+    try {
+      await axios.post("http://localhost:5000/api/contact", form);
+      setSubmitted(true);
+    } catch (err) {
+      setError("❌ Failed to send message. Please try again.");
+    } finally { setLoading(false); }
   };
+
+  const inputStyle = { padding: "12px 16px", borderRadius: 8, border: "1.5px solid #c1ad9b", fontSize: "1rem", color: "#5a4d41", outline: "none", width: "100%", boxSizing: "border-box" };
 
   return (
-    <div style={styles.container}>
-      {/* Navbar */}
-      <nav style={styles.navbar}>
-        <h1 style={styles.logo}>Granny_SB</h1>
-        <div style={styles.navLinks}>
-          <a href="/" style={styles.link}>Home</a>
-          <a href="/products" style={styles.link}>Shop</a>
-          <a href="/about" style={styles.link}>About</a>
-          <a href="/contact" style={{ ...styles.link, fontWeight: "700", borderBottom: "2px solid #a57c6d" }}>Contact</a>
-        </div>
-      </nav>
-
-      {/* Contact Form Section */}
-      <section style={styles.contactSection}>
-        <h2 style={styles.heading}>Get in Touch</h2>
-        <p style={styles.description}>
-          Have questions or want to share your crochet stories? We’d love to hear from you!
-        </p>
-
+    <div style={{ fontFamily: "'Segoe UI',sans-serif", backgroundColor: "#f5f0eb", color: "#5a4d41", minHeight: "100vh" }}>
+      <Navbar activePage="contact" />
+      <section style={{ maxWidth: 700, margin: "3rem auto", padding: "2rem 3rem", backgroundColor: "#fff9f4", borderRadius: 15, boxShadow: "0 4px 15px rgba(165,124,109,0.1)", textAlign: "center" }}>
+        <h2 style={{ fontSize: "2.8rem", marginBottom: "1rem", color: "#a57c6d", fontFamily: "'Brush Script MT',cursive" }}>Get in Touch</h2>
+        <p style={{ fontSize: "1.1rem", marginBottom: "2rem", color: "#7d6858" }}>Have questions? We'd love to hear from you!</p>
+        {error && <div style={{ color: "#b71c1c", marginBottom: "1rem", fontWeight: 500 }}>{error}</div>}
         {!submitted ? (
-          <form style={styles.form} onSubmit={handleSubmit} noValidate>
-            <label htmlFor="name" style={styles.label}>Name</label>
-            <input
-              type="text"
-              id="name"
-              name="name"
-              value={formData.name}
-              onChange={handleChange}
-              required
-              placeholder="Your full name"
-              style={styles.input}
-            />
-
-            <label htmlFor="email" style={styles.label}>Email</label>
-            <input
-              type="email"
-              id="email"
-              name="email"
-              value={formData.email}
-              onChange={handleChange}
-              required
-              placeholder="your.email@example.com"
-              style={styles.input}
-            />
-
-            <label htmlFor="message" style={styles.label}>Message</label>
-            <textarea
-              id="message"
-              name="message"
-              value={formData.message}
-              onChange={handleChange}
-              required
-              placeholder="Write your message here..."
-              rows="5"
-              style={{ ...styles.input, resize: "vertical" }}
-            ></textarea>
-
-            <button type="submit" style={styles.submitButton}>
-              Send Message
+          <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "1.3rem", textAlign: "left" }}>
+            {[{ n: "name", l: "Name", t: "text", p: "Your full name" }, { n: "email", l: "Email", t: "email", p: "your@email.com" }].map(f => (
+              <div key={f.n}>
+                <label style={{ fontWeight: 600, fontSize: "1rem", display: "block", marginBottom: "0.3rem" }}>{f.l}</label>
+                <input type={f.t} placeholder={f.p} value={form[f.n]} onChange={e => setForm({ ...form, [f.n]: e.target.value })} required style={inputStyle} />
+              </div>
+            ))}
+            <div>
+              <label style={{ fontWeight: 600, fontSize: "1rem", display: "block", marginBottom: "0.3rem" }}>Message</label>
+              <textarea placeholder="Write your message..." rows={5} value={form.message} onChange={e => setForm({ ...form, message: e.target.value })} required style={{ ...inputStyle, resize: "vertical" }} />
+            </div>
+            <button type="submit" disabled={loading}
+              style={{ padding: "14px 0", backgroundColor: "#a57c6d", border: "none", borderRadius: 30, color: "#fff", fontWeight: 700, fontSize: "1.1rem", cursor: loading ? "not-allowed" : "pointer", opacity: loading ? 0.7 : 1 }}>
+              {loading ? "Sending..." : "Send Message"}
             </button>
           </form>
         ) : (
-          <p style={styles.thankYouMessage}>
-            Thanks for reaching out! We’ll get back to you soon.
-          </p>
+          <div style={{ padding: "3rem", background: "#fff0f6", borderRadius: 16 }}>
+            <div style={{ fontSize: "3rem", marginBottom: "1rem" }}>✅</div>
+            <p style={{ fontSize: "1.2rem", color: "#6b5b4c", fontWeight: 600 }}>Thanks! We'll get back to you soon.</p>
+          </div>
         )}
       </section>
-
-      {/* Footer */}
-      <footer style={styles.footer}>
+      <footer style={{ backgroundColor: "#d7c6b8", textAlign: "center", padding: "1.5rem", fontSize: "0.9rem", color: "#5a4d41" }}>
         <p>© 2025 Granny_SB. All rights reserved.</p>
-        <p>
-          Follow us on
-          <a href="https://www.instagram.com" target="_blank" rel="noreferrer" style={styles.footerLink}> Instagram</a> &amp; 
-          <a href="https://www.facebook.com" target="_blank" rel="noreferrer" style={styles.footerLink}> Facebook</a>
-        </p>
       </footer>
     </div>
   );
 };
 
 export default Contact;
-
-const styles = {
-  container: {
-    fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
-    backgroundColor: "#f5f0eb",
-    color: "#5a4d41",
-    minHeight: "100vh",
-    display: "flex",
-    flexDirection: "column",
-  },
-  navbar: {
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "center",
-    padding: "1rem 2rem",
-    backgroundColor: "#d7c6b8",
-    boxShadow: "0 2px 5px rgba(90, 77, 65, 0.15)",
-  },
-  logo: {
-    fontSize: "1.8rem",
-    fontWeight: "bold",
-    color: "#a57c6d",
-  },
-  navLinks: {
-    display: "flex",
-    gap: "1.5rem",
-  },
-  link: {
-    textDecoration: "none",
-    color: "#7d6858",
-    fontWeight: "500",
-    transition: "color 0.3s ease",
-    cursor: "pointer",
-  },
-  contactSection: {
-    flexGrow: 1,
-    maxWidth: "700px",
-    margin: "3rem auto",
-    padding: "2rem 3rem",
-    backgroundColor: "#fff9f4",
-    borderRadius: "15px",
-    boxShadow: "0 4px 15px rgba(165, 124, 109, 0.1)",
-    textAlign: "center",
-  },
-  heading: {
-    fontSize: "2.8rem",
-    marginBottom: "1rem",
-    color: "#a57c6d",
-  },
-  description: {
-    fontSize: "1.2rem",
-    marginBottom: "2rem",
-    color: "#7d6858",
-  },
-  form: {
-    display: "flex",
-    flexDirection: "column",
-    gap: "1.3rem",
-    textAlign: "left",
-  },
-  label: {
-    fontWeight: "600",
-    fontSize: "1rem",
-    marginBottom: "0.3rem",
-  },
-  input: {
-    padding: "12px 16px",
-    borderRadius: "8px",
-    border: "1.5px solid #c1ad9b",
-    fontSize: "1rem",
-    fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
-    color: "#5a4d41",
-    outline: "none",
-    transition: "border-color 0.3s ease",
-  },
-  submitButton: {
-    marginTop: "1rem",
-    padding: "14px 0",
-    backgroundColor: "#a57c6d",
-    border: "none",
-    borderRadius: "30px",
-    color: "#fff",
-    fontWeight: "700",
-    fontSize: "1.1rem",
-    cursor: "pointer",
-    transition: "background-color 0.3s ease",
-  },
-  thankYouMessage: {
-    fontSize: "1.2rem",
-    color: "#6b5b4c",
-    fontWeight: "600",
-  },
-  footer: {
-    backgroundColor: "#d7c6b8",
-    textAlign: "center",
-    padding: "1.5rem",
-    fontSize: "0.9rem",
-    color: "#5a4d41",
-    marginTop: "3rem",
-  },
-  footerLink: {
-    marginLeft: "0.3rem",
-    color: "#a57c6d",
-    textDecoration: "none",
-    cursor: "pointer",
-  },
-};

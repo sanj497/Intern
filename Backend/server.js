@@ -3,36 +3,34 @@ import cors from "cors";
 import dotenv from "dotenv";
 import connectDB from "./config/mongodb.js";
 import khaltiRoutes from "./route/khaltiRoute.js";
-import userroute from "./route/userroute.js"
-import productroute from "./route/product.js"
+import userroute from "./route/userroute.js";
+import productroute from "./route/product.js";
 import favoriteRoutes from './route/favoriteRoutes.js';
 import adminRoute from './route/adminRoute.js';
-dotenv.config();         
-connectDB();            
+import orderRoute from './route/orderRoute.js';
+import cartRoute from './route/cartRoute.js';
+import contactRoute from './route/contactRoute.js';
+
+dotenv.config();
+connectDB();
 
 const app = express();
-const port = process.env.PORT || 5000;
-
-// Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cors());
 
-app.use("/api/khalti", khaltiRoutes); 
-app.use("/api/auth", userroute); 
-app.use("/api/product", productroute); 
-app.use("/api", adminRoute); 
+app.use("/api/khalti", khaltiRoutes);
+app.use("/api/auth", userroute);
+app.use("/api/product", productroute);
+app.use("/api", adminRoute);
+app.use("/api", favoriteRoutes);
+app.use("/api", orderRoute);
+app.use("/api", cartRoute);
+app.use("/api", contactRoute);
 
-app.use("/api/",favoriteRoutes ); 
+app.get("/", (req, res) => res.send("API is running..."));
 
-
-// Default route
-app.get("/", (req, res) => {
-  res.send("API is running...");
-});
-
-// Start server
-app.listen(port, () => {
-  console.log(` Server is running on PORT ${port}`); 
-  console.log(` Backend URI: ${process.env.BACKEND_URI}`);
+app.listen(process.env.PORT || 5000, () => {
+  console.log(` Server is running on PORT ${process.env.PORT || 5000}`);
+  console.log(` Backend URI: http://localhost:${process.env.PORT || 5000}`);
 });
